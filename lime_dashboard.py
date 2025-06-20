@@ -23,6 +23,7 @@ def cargar_datos():
     return df
 
 df = cargar_datos()
+df = df.dropna()
 
 # --- 2. Seleccionar actividad ---
 st.sidebar.subheader("📌 Selección de actividad")
