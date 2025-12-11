@@ -198,7 +198,7 @@ st.info(
 # --- 9. Reflexión guiada ---
 with st.expander("🧠 Reflexión personal (opcional)"):
     st.write("¿Qué aprendiste de esta explicación y de las recomendaciones?")
-    st.text_area("Escribe aquí tu reflexión:", "")
+    reflexion_texto = st.text_area("Escribe aquí tu reflexión:", "")
 
 # --- 10. Descargar reporte en PDF ---
 st.subheader("📥 Descargar reporte en PDF")
@@ -208,7 +208,7 @@ pdf_bytes = generar_pdf(
     pred=pred,
     exp_list=exp_list,
     reco_textos=reco_textos,
-    reflexion_texto=reflexion_texto
+    reflexion_texto=reflexion_texto  # <- ahora sí existe :)
 )
 
 st.download_button(
