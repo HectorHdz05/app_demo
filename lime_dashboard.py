@@ -4,6 +4,58 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from lime.lime_tabular import LimeTabularExplainer
 import matplotlib.pyplot as plt
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+
+def generar_pdf(actividad, pred, exp_list, reco_textos, reflexion_texto):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+
+    text = c.beginText(40, 750)
+    text.setFont("Helvetica", 11)
+
+    # --- Título ---
+    text.textLine("Reporte de Interpretación con LIME")
+    text.textLine("")
+
+    # --- Datos de la actividad ---
+    text.textLine("Detalles de la actividad:")
+    text.textLine(f"Actividad: {actividad['Name of the activity']}")
+    text.textLine(f"Costo real: {actividad['Cost']}")
+    text.textLine(f"Costo predicho: {pred:.2f}")
+    text.textLine(f"Budget: {actividad['Budget']}")
+    text.textLine(f"Time invested: {actividad['Time invested']}")
+    text.textLine(f"Type: {actividad['Type']}")
+    text.textLine(f"Moment: {actividad['Moment']}")
+    text.textLine(f"No. of people: {actividad['No. of people']}")
+    text.textLine("")
+
+    # --- Explicación LIME ---
+    text.textLine("Explicación local (LIME):")
+    for feature, weight in exp_list:
+        text.textLine(f"- {feature}: {weight:.4f}")
+    text.textLine("")
+
+    # --- Recomendaciones automáticas ---
+    text.textLine("Recomendaciones automáticas:")
+    for r in reco_textos:
+        text.textLine(r.replace("**", ""))
+    text.textLine("")
+
+    # --- Reflexión del estudiante ---
+    if reflexion_texto.strip():
+        text.textLine("Reflexión del estudiante:")
+        for linea in reflexion_texto.split("\n"):
+            text.textLine(linea)
+
+    c.drawText(text)
+    c.showPage()
+    c.save()
+
+    pdf_value = buffer.getvalue()
+    buffer.close()
+    return pdf_value
 
 st.set_page_config(page_title="LIME Dashboard", page_icon="🧠", layout="centered")
 
