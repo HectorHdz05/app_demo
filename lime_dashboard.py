@@ -199,7 +199,7 @@ fig = exp.as_pyplot_figure()
 st.pyplot(fig)
 
 # --- 8. “Recomendaciones” automáticas basadas en LIME ---
-st.subheader("🤖 Recomendaciones automáticas (beta)")
+st.subheader("🤖 Recomendaciones automáticas")
 
 # Tomamos las 2 variables con mayor impacto absoluto
 exp_sorted = sorted(exp_list, key=lambda x: abs(x[1]), reverse=True)
@@ -222,7 +222,7 @@ st.info(
 )
 
 # --- 9. Reflexión guiada ---
-with st.expander("🧠 Reflexión personal (opcional)"):
+with st.expander("🧠 Reflexión personal"):
     st.write("¿Qué aprendiste de esta explicación y de las recomendaciones?")
     reflexion_texto = st.text_area("Escribe aquí tu reflexión:", "")
 
