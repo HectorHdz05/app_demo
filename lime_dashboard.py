@@ -117,13 +117,39 @@ opcion_sel = st.sidebar.selectbox(
 # Recuperar índice
 idx = int(opcion_sel.split(" - ")[0])
 
-# --- 4. Preparar datos para el modelo ---
-X = df[['Budget', 'Time invested', 'Type', 'Moment', 'No. of people']]
-y = df['Cost']
+# --- 4. Preparar datos para el modelo (con limpieza robusta) ---
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, random_state=42
-)
+# Normaliza nombres de columnas por si llegan con espacios raros
+df.columns = df.columns.str.strip()
+
+# Columnas numéricas esperadas
+numeric_cols = ["Cost", "Budget", "Time invested", "Type", "Moment", "No. of people"]
+
+def to_number(series: pd.Series) -> pd.Series:
+    # Convierte a string, limpia símbolos comunes y convierte a número.
+    s = series.astype(str).str.strip()
+
+    # Quita símbolos de moneda y texto común (ajusta si tu dataset trae otros)
+    s = s.str.replace(r"[$]", "", regex=True)
+    s = s.str.replace(r"MXN|USD|EUR", "", regex=True)
+
+    # Quita separadores de miles tipo "1,200"
+    s = s.str.replace(",", "", regex=False)
+
+    # Si alguien usa coma decimal estilo "120,50" y NO hay miles,
+    # este caso se vuelve difícil; si lo necesitas, lo ajustamos luego.
+    return pd.to_numeric(s, errors="coerce")
+
+for col in numeric_cols:
+    df[col] = to_number(df[col])
+
+# Nos quedamos solo con filas completas en las columnas necesarias
+df_model = df.dropna(subset=numeric_cols).copy()
+
+X = df_model[['Budget', 'Time invested', 'Type', 'Moment', 'No. of people']]
+y = df_model['Cost']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 model = LinearRegression().fit(X_train, y_train)
 
 # --- 5. Mostrar datos de la instancia seleccionada ---
